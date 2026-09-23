@@ -1,0 +1,35 @@
+{
+  "name": "budget-tracker-express-ts-prisma",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "server.ts",
+  "scripts": {
+    "dev": "tsx ./src/server.ts --watch",
+    "build": "tsc",
+    "start": "node ./dist/server.js",
+    "test": "vitest"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/adapter-mariadb": "^7.10.0",
+    "@prisma/client": "^7.10.0",
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^18.0.0",
+    "express": "^5.2.1",
+    "uuid": "^14.0.2",
+    "winston": "^3.19.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.1",
+    "@types/supertest": "^7.2.1",
+    "prisma": "^7.10.0",
+    "supertest": "^7.2.2",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.1"
+  }
+}
