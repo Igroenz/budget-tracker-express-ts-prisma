@@ -2,14 +2,6 @@ import type { Request, Response, NextFunction } from "express";
 import { UnauthorizedError } from "../helpers/app-error.js";
 import { AuthRepository } from "../modules/auth/auth.repository.js";
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: unknown;
-    }
-  }
-}
-
 const authRepository = new AuthRepository();
 
 export const authenticate = async(req: Request, _res: Response, next: NextFunction) => {
