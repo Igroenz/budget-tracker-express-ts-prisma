@@ -13,32 +13,110 @@ datasource db {
 }
 
 model User {
-  id         String    @id @default(uuid())
-  email      String    @unique @db.VarChar(255)
-  name       String    @db.VarChar(255)
-  password   String    @db.VarChar(255)
-  token      String?   @db.VarChar(255)
-  created_at DateTime  @default(now()) @db.Timestamp()
-  updated_at DateTime  @updatedAt @db.Timestamp()
-  deleted_at DateTime? @db.Timestamp()
-  accounts   Account[]
+  id           String        @id @default(uuid())
+  email        String        @unique @db.VarChar(255)
+  name         String        @db.VarChar(255)
+  password     String        @db.VarChar(255)
+  token        String?       @db.VarChar(255)
+  created_at   DateTime      @default(now()) @db.Timestamp()
+  updated_at   DateTime      @updatedAt @db.Timestamp()
+  deleted_at   DateTime?     @db.Timestamp()
+  accounts     Account[]
+  categories   Category[]
+  transactions Transaction[]
+  transfers    Transfer[]
+  budgets      budget[]
 
   @@map("users")
 }
 
 model Account {
-  id         String          @id @default(uuid())
-  user_id    String
-  user       User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  name       String          @db.VarChar(255)
-  type       AccountTypeEnum @default(CASH)
-  balance    Decimal         @default(0) @db.Decimal(15, 2)
-  currency   String          @default("IDR") @db.VarChar(5)
-  created_at DateTime        @default(now()) @db.Timestamp()
-  updated_at DateTime        @updatedAt @db.Timestamp()
-  deleted_at DateTime?       @db.Timestamp()
+  id                 String          @id @default(uuid())
+  user_id            String
+  user               User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  name               String          @db.VarChar(255)
+  type               AccountTypeEnum @default(CASH)
+  balance            Decimal         @default(0) @db.Decimal(15, 2)
+  currency           String          @default("IDR") @db.VarChar(5)
+  created_at         DateTime        @default(now()) @db.Timestamp()
+  updated_at         DateTime        @updatedAt @db.Timestamp()
+  deleted_at         DateTime?       @db.Timestamp()
+  transactions       Transaction[]
+  sent_transfers     Transfer[]      @relation(name: "source_account")
+  received_transfers Transfer[]      @relation(name: "dest_account")
+  transfers          Transfer[]
 
   @@map("accounts")
+}
+
+model Category {
+  id           Int              @id @default(autoincrement())
+  user_id      String?
+  user         User?            @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  name         String           @db.VarChar(225)
+  type         CategoryTypeEnum @default(EXPENSE)
+  icon         String           @db.VarChar(100)
+  color        String           @db.VarChar(100)
+  created_at   DateTime         @default(now()) @db.Timestamp()
+  updated_at   DateTime         @updatedAt @db.Timestamp()
+  transactions Transaction[]
+  budgets      budget[]
+
+  @@map("categories")
+}
+
+model Transaction {
+  id               String    @id @default(ulid())
+  user_id          String
+  user             User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  account_id       String
+  account          Account   @relation(fields: [account_id], references: [id])
+  category_id      Int
+  category         Category  @relation(fields: [category_id], references: [id])
+  amount           Decimal   @default(0) @db.Decimal(15, 2)
+  description      String    @db.VarChar(255)
+  transaction_date DateTime  @default(now()) @db.Timestamp()
+  created_at       DateTime  @default(now()) @db.Timestamp()
+  updated_at       DateTime  @updatedAt @db.Timestamp()
+  deleted_at       DateTime? @db.Timestamp()
+
+  @@map("transactions")
+}
+
+model Transfer {
+  id                String    @id @default(ulid())
+  user_id           String
+  user              User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  source_account_id String
+  source_account    Account   @relation(name: "source_account", fields: [source_account_id], references: [id])
+  dest_account_id   String
+  dest_account      Account   @relation(name: "dest_account", fields: [dest_account_id], references: [id])
+  amount            Decimal   @default(0) @db.Decimal(15, 2)
+  description       String    @db.VarChar(255)
+  transaction_date  DateTime  @default(now()) @db.Timestamp()
+  account           Account?  @relation(fields: [accountId], references: [id])
+  accountId         String?
+  created_at        DateTime  @default(now()) @db.Timestamp()
+  updated_at        DateTime  @updatedAt @db.Timestamp()
+  deleted_at        DateTime? @db.Timestamp()
+
+  @@map("transfers")
+}
+
+model budget {
+  id          String           @id @default(uuid())
+  user_id     String
+  user        User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  category_id Int
+  category    Category         @relation(fields: [category_id], references: [id])
+  amount      Decimal          @default(0) @db.Decimal(15, 2)
+  period      BudgetPeriodEnum @default(WEEKLY)
+  start_date  DateTime
+  end_date    DateTime
+  created_at  DateTime         @default(now()) @db.Timestamp()
+  updated_at  DateTime         @updatedAt @db.Timestamp()
+
+  @@map("budgets")
 }
 
 enum AccountTypeEnum {
@@ -46,4 +124,15 @@ enum AccountTypeEnum {
   BANK
   E_WALLET
   OTHER
+}
+
+enum CategoryTypeEnum {
+  INCOME
+  EXPENSE
+}
+
+enum BudgetPeriodEnum {
+  WEEKLY
+  MONTHLY
+  YEARLY
 }
