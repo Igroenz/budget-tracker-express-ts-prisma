@@ -53,7 +53,7 @@ model Category {
   id           Int              @id @default(autoincrement())
   user_id      String?
   user         User?            @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  name         String           @db.VarChar(225)
+  name         String           @db.VarChar(100)
   type         CategoryTypeEnum @default(EXPENSE)
   icon         String           @db.VarChar(100)
   color        String           @db.VarChar(100)

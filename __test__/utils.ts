@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "../src/config/db"
+import { CategoryTypeEnum } from "../src/generated/prisma/enums";
 
 export const createTestUser = async () => {
   await prisma.user.create({
@@ -55,5 +56,82 @@ export const createTestAccount = async () => {
 export const getTestAccountForAccount = async () => {
   return prisma.account.findFirst({
     where: {user: {email: "account@test.com"}},
+  })
+}
+
+// Category
+export const createTestUserForCategory = async () => {
+  await prisma.user.create({
+    data: {
+      email: "category@test.com",
+      name: "test name",
+      token: "categorytest",
+      password: await bcrypt.hash("test", 10),
+    }
+  })
+};
+
+export const removeTestUserForCategory = async () => {
+  await prisma.user.deleteMany({
+    where: {email: "category@test.com",}
+  });
+};
+
+const dataCategories = [
+  {
+    name: "Gaji",
+    type: CategoryTypeEnum.INCOME,
+    icon: "circle-dollar-sign",
+    color: "#4cb3a0",
+    user: { connect: { email: "category@test.com" } }
+  },
+  {
+    name: "Investasi",
+    type: CategoryTypeEnum.INCOME,
+    icon: "chart-line",
+    color: "#0084d1",
+    user: { connect: { email: "category@test.com" } }
+  },
+  {
+    name: "Bonus",
+    type: CategoryTypeEnum.INCOME,
+    icon: "trophy",
+    color: "#0092b8",
+    user: { connect: { email: "category@test.com" } }
+  },
+  {
+    name: "Debts",
+    type: CategoryTypeEnum.EXPENSE,
+    icon: "wallet-cards",
+    color: "#9f2d00",
+    user: { connect: { email: "category@test.com" } }
+  },
+  {
+    name: "Spends",
+    type: CategoryTypeEnum.EXPENSE,
+    icon: "shopping-cart",
+    color: "#9f0712",
+    user: { connect: { email: "category@test.com" } }
+  },
+  {
+    name: "Bills",
+    type: CategoryTypeEnum.EXPENSE,
+    icon: "receipt-text",
+    color: "#ffba00",
+    user: { connect: { email: "category@test.com" } }
+  },
+];
+
+export const createTestCategories = async () => {
+  for (const item of dataCategories) {
+    await prisma.category.create({
+      data: item
+    })
+  }
+};
+
+export const getTestCategoryForCategory = async () => {
+  return prisma.category.findFirst({
+    where: {user: {email: "category@test.com"}},
   })
 }
