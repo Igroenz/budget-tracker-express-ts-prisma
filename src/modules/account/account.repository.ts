@@ -3,6 +3,15 @@ import type { AccountWhereInput } from "../../generated/prisma/models.js";
 import type { AccountCreateDTO, AccountUpdateDTO } from "./account.validator.js";
 
 export class AccountRepository {
+  async checkAccount(userId: string, name: string) {
+    return prisma.account.count({
+      where: {
+        user_id: userId,
+        name: name,
+      }
+    }) 
+  }
+
   async create(userId: string, data: AccountCreateDTO) {
     return prisma.account.create({
       data: {

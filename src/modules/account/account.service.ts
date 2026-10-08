@@ -1,5 +1,5 @@
 import { logger } from "../../config/logging.js";
-import { NotFoundError } from "../../helpers/app-error.js";
+import { ConflictError, NotFoundError } from "../../helpers/app-error.js";
 import { isUser, ValidatorDataUnknown } from "../../helpers/unknown-check.js";
 import { AccountRepository } from "./account.repository.js";
 import type { AccountCreateDTO, AccountParamsDTO, AccountQueryDTO, AccountUpdateDTO } from "./account.validator.js";
@@ -12,6 +12,9 @@ export class AccountService {
 
   async create(user: unknown, dto: AccountCreateDTO) {
     const { id } = ValidatorDataUnknown(user, isUser);
+    const checkAccount = await this.accountRepository.checkAccount(id, dto.name);
+    if (checkAccount !== 0) throw new ConflictError("Data sudah ada");
+    
     return this.accountRepository.create(id, dto);
   };
 
