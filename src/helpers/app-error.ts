@@ -34,3 +34,9 @@ export class ForbiddenError extends AppError {
     super(403, message)
   }
 };
+
+export class InsufficientBalanceError extends AppError {
+  constructor(message = "Insufficient balance for this transaction", details?: unknown) {
+    super(422, message, details)
+  }
+};

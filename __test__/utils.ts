@@ -135,3 +135,70 @@ export const getTestCategoryForCategory = async () => {
     where: {user: {email: "category@test.com"}},
   })
 }
+
+// Transactions
+export const createTestUserForTransaction = async () => {
+  await prisma.user.create({
+    data: {
+      email: "transaction@test.com",
+      name: "test name",
+      token: "transactiontest",
+      password: await bcrypt.hash("test", 10),
+    }
+  })
+};
+
+export const removeTestUserForTransaction = async () => {
+  await prisma.user.deleteMany({
+    where: {email: "transaction@test.com",}
+  });
+};
+
+export const createAccountForTransaction = async () => {
+  await prisma.account.create({
+    data: {
+        name: `Bank XXX`,
+        type: "BANK",
+        balance: 10000,
+        currency: "IDR",
+        user: {
+          connect: { email: "transaction@test.com" }
+        }
+      }
+  })
+}
+
+export const removeAccountForTransaction = async () => {
+  await prisma.account.deleteMany({
+    where: {user_id: "transaction@test.com"}
+  })
+}
+
+export const createCategoryForTransaction = async () => {
+  await prisma.category.create({
+    data: {
+      name: "Spends",
+      type: CategoryTypeEnum.EXPENSE,
+      icon: "shopping-cart",
+      color: "#9f0712",
+      user: { connect: { email: "transaction@test.com" } }
+    }
+  })
+}
+
+export const getDataForTransaction = async () => {
+  const account = await prisma.account.findFirst({
+    where: { user: { email: "transaction@test.com" } },
+  });
+  const category = await prisma.category.findFirst({
+    where: { user: { email: "transaction@test.com" } },
+  });
+
+  return [account, category];
+}
+
+export const removeTransaction = async () => {
+  await prisma.transaction.deleteMany({
+    where: { user: { email: "transaction@test.com" } },
+  })
+}
