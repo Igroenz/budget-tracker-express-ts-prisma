@@ -43,7 +43,6 @@ model Account {
   transactions       Transaction[]
   sent_transfers     Transfer[]      @relation(name: "source_account")
   received_transfers Transfer[]      @relation(name: "dest_account")
-  transfers          Transfer[]
 
   @@map("accounts")
 }
@@ -63,6 +62,24 @@ model Category {
   @@map("categories")
 }
 
+model Transfer {
+  id                String    @id @default(ulid())
+  user_id           String
+  user              User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  source_account_id String
+  source_account    Account   @relation(name: "source_account", fields: [source_account_id], references: [id])
+  dest_account_id   String
+  dest_account      Account   @relation(name: "dest_account", fields: [dest_account_id], references: [id])
+  amount            Decimal   @default(0) @db.Decimal(15, 2)
+  description       String?   @db.VarChar(255)
+  transaction_date  DateTime  @default(now()) @db.Timestamp()
+  created_at        DateTime  @default(now()) @db.Timestamp()
+  updated_at        DateTime  @updatedAt @db.Timestamp()
+  deleted_at        DateTime? @db.Timestamp()
+
+  @@map("transfers")
+}
+
 model Transaction {
   id               String    @id @default(ulid())
   user_id          String
@@ -79,26 +96,6 @@ model Transaction {
   deleted_at       DateTime? @db.Timestamp()
 
   @@map("transactions")
-}
-
-model Transfer {
-  id                String    @id @default(ulid())
-  user_id           String
-  user              User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  source_account_id String
-  source_account    Account   @relation(name: "source_account", fields: [source_account_id], references: [id])
-  dest_account_id   String
-  dest_account      Account   @relation(name: "dest_account", fields: [dest_account_id], references: [id])
-  amount            Decimal   @default(0) @db.Decimal(15, 2)
-  description       String?   @db.VarChar(255)
-  transaction_date  DateTime  @default(now()) @db.Timestamp()
-  account           Account?  @relation(fields: [accountId], references: [id])
-  accountId         String?
-  created_at        DateTime  @default(now()) @db.Timestamp()
-  updated_at        DateTime  @updatedAt @db.Timestamp()
-  deleted_at        DateTime? @db.Timestamp()
-
-  @@map("transfers")
 }
 
 enum AccountTypeEnum {

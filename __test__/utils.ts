@@ -202,3 +202,57 @@ export const removeTransaction = async () => {
     where: { user: { email: "transaction@test.com" } },
   })
 }
+
+// Tranfers
+export const createTestUserForTransfer = async () => {
+  await prisma.user.create({
+    data: {
+      email: "transfer@test.com",
+      name: "test name",
+      token: "transfertest",
+      password: await bcrypt.hash("test", 10),
+    }
+  })
+};
+
+export const removeTestUserForTransfer = async () => {
+  await prisma.user.deleteMany({
+    where: {email: "transfer@test.com",}
+  });
+};
+
+export const createAccountForTransfer = async () => {
+  for (let i = 1; i < 3; i++) {
+    const balance = i * 1000;
+    await prisma.account.create({
+      data: {
+        name: `Bank ${i}`,
+        type: "BANK",
+        balance: balance,
+        currency: "IDR",
+        user: {
+          connect: { email: "transfer@test.com" }
+        }
+      },
+    });
+  }
+}
+
+export const removeAccountForTransfer = async () => {
+  await prisma.account.deleteMany({
+    where: {user_id: "transfer@test.com"}
+  })
+}
+
+export const getTestAccountForTransfer = async () => {
+  return prisma.account.findMany({
+    where: { user: { email: "transfer@test.com" } },
+    orderBy: [{ name: "asc" }],
+  });
+}
+
+export const removeTransfer = async () => {
+  await prisma.transfer.deleteMany({
+    where: { user: { email: "transfer@test.com" } },
+  })
+}
